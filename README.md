@@ -115,6 +115,6 @@ Our config is organized as follows:
 
 ## References
 * Learning Deep Features for Discriminative Localization: [paper](http://cnnlocalization.csail.mit.edu/Zhou_Learning_Deep_Features_CVPR_2016_paper.pdf)
-* Weakly Supervised Learning of Instance Segmentation with Inter-pixel Relations: [paper](Weakly Supervised Learning of Instance Segmentation with Inter-pixel Relations)
+* Weakly Supervised Learning of Instance Segmentation with Inter-pixel Relations: [paper](https://arxiv.org/abs/1904.05044)
 * U-Net: Convolutional Networks for Biomedical Image Segmentation: [paper](https://arxiv.org/abs/1505.04597)
 * Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation: [paper](https://arxiv.org/abs/1802.02611)
