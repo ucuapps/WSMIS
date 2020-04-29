@@ -20,8 +20,13 @@ WSMIS is released under the [GNU General Public License version 3 license](LICEN
 
 ## General Pipeline
 * Step 1. **Cam extraction.** 
+    * A fully-supervised classification model (ResNet50 or VGG16) is trained on image-level labels. Grad-CAM++ is used to generate activation maps.
 * Step 2. **Boundaries improvements via IRNet.** 
+    * IRNet takes the generated CAM from Step 1. and trains ResNet50 with two output branches that predict a displacement vector field and a class boundary map, correspondingly.
 * Step 3. **Segmentation.** 
+    * Outputs from Step 2 are used as pseudo-labels for training a fully-supervised segmentation model (DeepLabv3+ or U-Net).
+
+Some postprocessing techniques are applied in between the steps, please refer to the paper for details.
 
 ## Data
 #### Download PASCAL VOC 2012 devkit
@@ -110,6 +115,6 @@ Our config is organized as follows:
 
 ## References
 * Learning Deep Features for Discriminative Localization: [paper](http://cnnlocalization.csail.mit.edu/Zhou_Learning_Deep_Features_CVPR_2016_paper.pdf)
-* Weakly Supervised Learning of Instance Segmentation with Inter-pixel Relations: [paper](Weakly Supervised Learning of Instance Segmentation with Inter-pixel Relations), [code](https://github.com/jiwoon-ahn/irn)
+* Weakly Supervised Learning of Instance Segmentation with Inter-pixel Relations: [paper](Weakly Supervised Learning of Instance Segmentation with Inter-pixel Relations)
 * U-Net: Convolutional Networks for Biomedical Image Segmentation: [paper](https://arxiv.org/abs/1505.04597)
 * Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation: [paper](https://arxiv.org/abs/1802.02611)
