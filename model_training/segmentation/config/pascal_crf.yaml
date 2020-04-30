@@ -1,0 +1,81 @@
+---
+project: lid_segmentation
+task: crf_segmentation
+log_path: /home/ostap/logs
+
+devices:
+  - 'cuda:1'
+  - 'cuda:2'
+
+train:
+  path: /datasets/LID/PascalVOC2012SegmentationAug/train.json
+  masks: out_masks/irn
+  transform:
+    size: &SIZE 513
+    augmentation_scope: strong
+    images_normalization: &IMAGES_NORMALIZATION default
+    images_output_format_type: &IMAGES_OUTPUT_FORMAT_TYPE float
+    masks_normalization: &MASKS_NORMALIZATION none
+    masks_output_format_type: &MASKS_FORMAT_TYPE long
+    size_transform: resize
+
+val:
+  path: /datasets/LID/PascalVOC2012SegmentationAug/val.json
+  masks: ../VOCdevkit/VOC2012/SegmentationClass
+  transform:
+    size: *SIZE
+    augmentation_scope: none
+    images_normalization: *IMAGES_NORMALIZATION
+    images_output_format_type: *IMAGES_OUTPUT_FORMAT_TYPE
+    masks_normalization: *MASKS_NORMALIZATION
+    masks_output_format_type: *MASKS_FORMAT_TYPE
+    size_transform: resize
+
+model:
+  arch: deeplabv3plus_resnet50
+  pretrained: false
+  classes: 21
+  loss:
+    - name: categorical_cross_entropy
+      weight: 0.5
+      ignore_index: 255
+    - name: kldiv
+      weight: 0.5
+#    - name: binary_cross_entropy
+#      weight: 0.333
+  metrics:
+    - iou
+
+crf:
+  scale_factor: 4
+  iterations: 4
+
+num_epochs: &EPOCHS 30
+batch_size: 12
+#optimizer:
+#  name: adam
+#  lr: 0.0005
+#  weight_decay: 0.000001
+#
+#scheduler:
+#  name: plateau
+#  mode: max
+#  patience: 3
+#  factor: 0.5
+#  min_lr: 0.0000001
+
+optimizer:
+  name: sgd
+  momentum: 0.9
+  weight_decay: 0.000001
+  lr: [0.001, 0.01]
+
+scheduler:
+  name: poly
+  max_iters: *EPOCHS
+  min_lr: 1.0e-6
+  power: 0.9
+
+monitor:
+  method: epochs
+  interval: 15

@@ -1,0 +1,65 @@
+---
+project: lid_segmentation
+task: pneumothorax_classification
+log_path: /home/dobko/logs
+
+devices:
+  - 'cuda:1'
+  - 'cuda:2'
+
+train:
+  path: /datasets/LID/Pneumothorax/train/train.csv
+  transform:
+    size: &SIZE 512
+    augmentation_scope: pneumothorax
+    images_normalization: &IMAGES_NORMALIZATION default
+    images_output_format_type: &IMAGES_OUTPUT_FORMAT_TYPE float
+    size_transform: resize
+
+val:
+  path: /datasets/LID/Pneumothorax/train/val.csv
+  transform:
+    size: *SIZE
+    augmentation_scope: none
+    images_normalization: *IMAGES_NORMALIZATION
+    images_output_format_type: *IMAGES_OUTPUT_FORMAT_TYPE
+    size_transform: resize
+
+
+model:
+  arch: resnet50_full  #resnet50_dropblock
+  pretrained: True
+  classes: 1
+  loss:
+    name: binary_cross_entropy
+  metrics:
+    - f1
+    - accuracy
+  regularize:
+    name: DropBlock
+    parameters:
+      drop_prob: 0.2
+      block_size: 7
+
+num_epochs: 50
+batch_size: 16
+optimizer:
+  name: Adam
+  parameters:
+    lr:
+      - 0.0001
+      - 0.0002
+      - 0.001
+      - 0.002
+    weight_decay: 1.0e-05
+
+scheduler:
+  name: step
+  step_size: 5
+  gamma: 0.1
+
+monitor:
+  method: epochs
+  interval: 5
+
+

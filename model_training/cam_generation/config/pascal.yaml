@@ -1,0 +1,71 @@
+project: lid_segmentation
+task: cam_generation
+log_path: /home/dobko/logs
+
+devices:
+  - 'cuda:2'
+  - 'cuda:1'
+
+
+train:
+  path: /datasets/LID/PascalVOC2012SegmentationAug/train.json
+  transform:
+    size: &SIZE 352
+    augmentation_scope: strong
+    images_normalization: &IMAGES_NORMALIZATION default
+    images_output_format_type: &IMAGES_OUTPUT_FORMAT_TYPE float
+    size_transform: resize
+
+val:
+  path: /datasets/LID/PascalVOC2012SegmentationAug/val.json
+  transform:
+    size: *SIZE
+    augmentation_scope: none
+    images_normalization: *IMAGES_NORMALIZATION
+    images_output_format_type: *IMAGES_OUTPUT_FORMAT_TYPE
+    size_transform: resize
+
+model:
+  arch: resnet50_full #resnet50_dropblock_scheduler #resnet50_oaa  #resnet50_gap_dropblock  vgg_gap_dropblock  #vgg_gap_dropblock  #resnet_dropblock
+  pretrained: True
+  classes: 20
+  loss:
+    name: binary_cross_entropy
+  metrics:
+    - mlf1
+    - mlaccuracy
+  regularize:
+    name: DropBlock
+    parameters:
+      drop_prob: 0.3
+      block_size: 7
+
+
+num_epochs: 50
+batch_size: 32
+optimizer:
+  name: RAdam
+  parameters:
+    lr:
+      - 0.00001
+      - 0.0001
+      - 0.0002
+      - 0.001
+    weight_decay: 1.0e-05
+
+#scheduler:
+#  name: plateau
+#  mode: max
+#  patience: 2
+#  factor: 0.5
+#  min_lr: 0.0000001
+
+scheduler:
+  name: step
+  step_size: 10
+  gamma: 0.1
+
+monitor:
+  method: epochs
+  interval: 5
+

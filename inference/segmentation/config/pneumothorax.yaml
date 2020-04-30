@@ -1,0 +1,20 @@
+---
+project: lid_segmentation
+task: segmentation
+
+devices:
+  - cuda:2
+
+experiment_path: /home/ostap/logs/segmentation/deeplabv3plus_resnet50-2020-04-09-15-36-45
+batch_size: 1
+
+model:
+  arch: unet
+  encoder: resnet50
+  weights_path: model_best.h5
+  pretrained: false
+  classes: 21
+  metrics:
+  - iou
+
+
