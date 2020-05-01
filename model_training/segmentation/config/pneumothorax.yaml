@@ -1,0 +1,63 @@
+---
+project: lid_segmentation
+task: pneumothorax_segmentation
+log_path: /home/ostap/logs
+
+devices:
+  - 'cuda:1'
+  - 'cuda:2'
+
+train:
+  path: /datasets/LID/Pneumothorax/train/train.csv
+  masks: out_masks/sem_seg_thresh
+  transform:
+    size: &SIZE 256
+    augmentation_scope: pneumothorax
+    images_normalization: &IMAGES_NORMALIZATION default
+    images_output_format_type: &IMAGES_OUTPUT_FORMAT_TYPE float
+    masks_normalization: &MASKS_NORMALIZATION none
+    masks_output_format_type: &MASKS_FORMAT_TYPE float
+    size_transform: resize
+
+val:
+  path: /datasets/LID/Pneumothorax/train/val.csv
+  masks: masks
+  transform:
+    size: *SIZE
+    augmentation_scope: none
+    images_normalization: *IMAGES_NORMALIZATION
+    images_output_format_type: *IMAGES_OUTPUT_FORMAT_TYPE
+    masks_normalization: *MASKS_NORMALIZATION
+    masks_output_format_type: *MASKS_FORMAT_TYPE
+    size_transform: resize
+
+model:
+  arch: unet
+  encoder: resnet50
+  pretrained: false
+  classes: 2
+  loss:
+    - name: binary_cross_entropy
+
+  metrics:
+    - f1
+
+num_epochs: &EPOCHS 40
+batch_size: 64
+
+optimizer:
+  name: SGD
+  parameters:
+    momentum: 0.9
+    weight_decay: 0.000001
+    lr: [0.0001, 0.001]
+
+scheduler:
+  name: poly
+  max_iters: *EPOCHS
+  min_lr: 1.0e-6
+  power: 0.9
+
+monitor:
+  method: epochs
+  interval: 5

@@ -1,0 +1,55 @@
+---
+project: lid_segmentation
+task: segmentation
+log_path: /home/ostap/logs
+
+train:
+  path: /datasets/LID/ILSVRC/Data/DET/train/train.json
+  mask_path: /datasets/LID/temp/maps/
+  transform:
+    size: &SIZE 352
+    augmentation_scope: strong
+    images_normalization: &IMAGES_NORMALIZATION default
+    images_output_format_type: &IMAGES_OUTPUT_FORMAT_TYPE float
+    masks_normalization: &MASKS_NORMALIZATION none
+    masks_output_format_type: &MASKS_FORMAT_TYPE long
+    size_transform: resize
+
+val:
+  path: /datasets/LID/ILSVRC/Data/DET/train/val.json
+  mask_path: /datasets/LID/temp/maps/
+  transform:
+    size: *SIZE
+    augmentation_scope: none
+    images_normalization: *IMAGES_NORMALIZATION
+    images_output_format_type: *IMAGES_OUTPUT_FORMAT_TYPE
+    masks_normalization: *MASKS_NORMALIZATION
+    masks_output_format_type: *MASKS_FORMAT_TYPE
+    size_transform: resize
+
+model:
+  arch: deeplabv3_resnet50
+  pretrained: false
+  classes: 201
+  loss:
+    name: categorical_cross_entropy
+  metrics:
+    - iou
+
+num_epochs: 150
+batch_size: 8
+optimizer:
+  name: adam
+  lr: 0.0005
+  weight_decay: 0.000001
+
+scheduler:
+  name: plateau
+  mode: max
+  patience: 3
+  factor: 0.5
+  min_lr: 0.0000001
+
+monitor:
+  method: epochs
+  interval: 5

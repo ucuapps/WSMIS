@@ -1,0 +1,62 @@
+---
+project: lid_segmentation
+task: segmentation
+log_path: /home/ostap/logs
+
+devices:
+  - 'cuda:1'
+  - 'cuda:2'
+
+train:
+  path: /datasets/LID/PascalVOC2012SegmentationAug/train.json
+  masks: out_masks/cam_grad_pp_dropblock
+  transform:
+    size: &SIZE 512
+    augmentation_scope: strong
+    images_normalization: &IMAGES_NORMALIZATION default
+    images_output_format_type: &IMAGES_OUTPUT_FORMAT_TYPE float
+    masks_normalization: &MASKS_NORMALIZATION none
+    masks_output_format_type: &MASKS_FORMAT_TYPE long
+    size_transform: resize
+
+val:
+  path: /datasets/LID/PascalVOC2012SegmentationAug/val.json
+  masks: ../VOCdevkit/VOC2012/SegmentationClass
+  transform:
+    size: *SIZE
+    augmentation_scope: none
+    images_normalization: *IMAGES_NORMALIZATION
+    images_output_format_type: *IMAGES_OUTPUT_FORMAT_TYPE
+    masks_normalization: *MASKS_NORMALIZATION
+    masks_output_format_type: *MASKS_FORMAT_TYPE
+    size_transform: resize
+
+model:
+  arch: serexnext_unet
+  pretrained: false
+  classes: 21
+  loss:
+    name: categorical_cross_entropy
+    ignore_index: 255
+  metrics:
+    - iou
+
+num_epochs: &EPOCHS 40
+batch_size: 12
+
+optimizer:
+  name: SGD
+  parameters:
+    momentum: 0.9
+    weight_decay: 0.000001
+    lr: [0.001, 0.01]
+
+scheduler:
+  name: poly
+  max_iters: *EPOCHS
+  min_lr: 1.0e-6
+  power: 0.9
+
+monitor:
+  method: epochs
+  interval: 5

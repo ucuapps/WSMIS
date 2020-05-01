@@ -1,0 +1,48 @@
+---
+project: lid_segmentation
+task: cam_generation
+log_path: /home/ostap/logs
+
+maps_layer: backbone
+weights_layer: extra_linear
+
+train:
+  input_path: /datasets/LID/PascalVOC2012SegmentationAug/train.json
+  output_path: /datasets/LID/PascalVOC2012SegmentationAug/out_masks/dropblock_resnet50_grubcut
+  transform:
+    size: &SIZE 352
+    augmentation_scope: none
+    images_normalization: &IMAGES_NORMALIZATION default
+    images_output_format_type: &IMAGES_OUTPUT_FORMAT_TYPE float
+    masks_normalization: &MASKS_NORMALIZATION none
+    masks_output_format_type: &MASKS_FORMAT_TYPE long
+    size_transform: resize
+
+val:
+  input_path: /datasets/LID/PascalVOC2012SegmentationAug/val.json
+  output_path: /datasets/LID//PascalVOC2012SegmentationAug/out_masks/grub_cut
+  transform:
+    size: *SIZE
+    augmentation_scope: none
+    images_normalization: *IMAGES_NORMALIZATION
+    images_output_format_type: *IMAGES_OUTPUT_FORMAT_TYPE
+    masks_normalization: *MASKS_NORMALIZATION
+    masks_output_format_type: *MASKS_FORMAT_TYPE
+    size_transform: resize
+
+model:
+  arch: resnet50_dropblock
+  weights_path:  /home/dobko/logs/cam_generation/resnet50_dropblock-2020-04-07-12-52-08/model_best.h5
+  pretrained: True
+  classes: 20
+  regularize:
+    name: DropBlock
+    parameters:
+      block_size: 7
+      drop_prob: 0.2
+
+
+batch_size: 32
+interpolation: bicubic
+background_threshold: 0.2
+use_predicted_labels: False
