@@ -1,7 +1,7 @@
 ---
 project: lid_segmentation
 task: cam_generation
-log_path: /home/ostap/logs
+log_path: /home/logs
 
 maps_layer: backbone
 weights_layer: extra_linear
@@ -32,7 +32,7 @@ val:
 
 model:
   arch: resnet50_dropblock
-  weights_path:  /home/dobko/logs/cam_generation/resnet50_dropblock-2020-04-07-12-52-08/model_best.h5
+  weights_path:  /home/logs/cam_generation/resnet50_dropblock-2020-04-07-12-52-08/model_best.h5
   pretrained: True
   classes: 20
   regularize:

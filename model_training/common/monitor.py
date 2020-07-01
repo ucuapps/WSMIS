@@ -29,4 +29,6 @@ class TrainingMonitor:
 
     @classmethod
     def from_config(cls, monitor_config):
-        return cls(monitor_method=monitor_config['method'], interval=monitor_config['interval'])
+        return cls(
+            monitor_method=monitor_config["method"], interval=monitor_config["interval"]
+        )

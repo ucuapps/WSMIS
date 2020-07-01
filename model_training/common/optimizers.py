@@ -8,13 +8,13 @@ from torch.optim.optimizer import Optimizer
 
 class RAdam(Optimizer):
     def __init__(
-            self,
-            params,
-            lr=1e-3,
-            betas=(0.9, 0.999),
-            eps=1e-8,
-            weight_decay=0,
-            degenerated_to_sgd=True,
+        self,
+        params,
+        lr=1e-3,
+        betas=(0.9, 0.999),
+        eps=1e-8,
+        weight_decay=0,
+        degenerated_to_sgd=True,
     ):
         if lr <= 0.0:
             raise ValueError("Invalid learning rate: {}".format(lr))
@@ -27,13 +27,13 @@ class RAdam(Optimizer):
 
         self.degenerated_to_sgd = degenerated_to_sgd
         if (
-                isinstance(params, (list, tuple))
-                and len(params) > 0
-                and isinstance(params[0], dict)
+            isinstance(params, (list, tuple))
+            and len(params) > 0
+            and isinstance(params[0], dict)
         ):
             for param in params:
                 if "betas" in param and (
-                        param["betas"][0] != betas[0] or param["betas"][1] != betas[1]
+                    param["betas"][0] != betas[0] or param["betas"][1] != betas[1]
                 ):
                     param["buffer"] = [[None, None, None] for _ in range(10)]
         defaults = dict(

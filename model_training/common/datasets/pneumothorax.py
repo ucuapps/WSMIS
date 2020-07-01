@@ -7,9 +7,9 @@ import numpy as np
 from model_training.common.datasets.common import read_mask
 
 __all__ = [
-    'PneumothoraxClassificationTrainDataset',
-    'PneumothoraxClassificationTestDataset',
-    'PneumothoraxSegmentationDataset'
+    "PneumothoraxClassificationTrainDataset",
+    "PneumothoraxClassificationTestDataset",
+    "PneumothoraxSegmentationDataset",
 ]
 
 
@@ -27,11 +27,15 @@ class PneumothoraxClassificationTrainDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         name, label = self.images_list.iloc[idx]
 
-        ds = pydicom.dcmread(os.path.join(self.parent_dir, name + '.dcm'))
+        ds = pydicom.dcmread(os.path.join(self.parent_dir, name + ".dcm"))
         image = np.tile(ds.pixel_array[..., None], 3)
         image = self.transform(image, mask=None)
         if self.return_name:
-            return torch.FloatTensor(image).permute(2, 0, 1), torch.FloatTensor([label]), name
+            return (
+                torch.FloatTensor(image).permute(2, 0, 1),
+                torch.FloatTensor([label]),
+                name,
+            )
 
         return torch.FloatTensor(image).permute(2, 0, 1), torch.FloatTensor([label])
 
@@ -49,7 +53,7 @@ class PneumothoraxClassificationTestDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         name, _ = self.images_list.iloc[idx]
 
-        ds = pydicom.dcmread(os.path.join(self.parent_dir, name + '.dcm'))
+        ds = pydicom.dcmread(os.path.join(self.parent_dir, name + ".dcm"))
         image = np.tile(ds.pixel_array[..., None], 3)
         image = self.transform(image, mask=None)
 
@@ -70,12 +74,17 @@ class PneumothoraxSegmentationDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         name, label, *_ = self.images_list.iloc[idx]
 
-        ds = pydicom.dcmread(os.path.join(self.parent_dir, name + '.dcm'))
+        ds = pydicom.dcmread(os.path.join(self.parent_dir, name + ".dcm"))
         image = np.tile(ds.pixel_array[..., None], 3)
         if label == 0:
             mask = np.zeros(image.shape[:2], dtype=np.uint8)[..., None]
         else:
-            mask = read_mask(os.path.join(self.masks_dir, name + '.png'))
+            mask = read_mask(os.path.join(self.masks_dir, name + ".png"))
         image, mask_transformed = self.transform(image=image, mask=mask)
 
-        return image.permute(2, 0, 1), mask_transformed.squeeze(-1), name, mask.squeeze(-1)
+        return (
+            image.permute(2, 0, 1),
+            mask_transformed.squeeze(-1),
+            name,
+            mask.squeeze(-1),
+        )

@@ -9,7 +9,7 @@ import numpy as np
 
 
 class DropBlock2D(nn.Module):
-    r"""Randomly zeroes 2D spatial blocks of the input tensor.
+    """Randomly zeroes 2D spatial blocks of the input tensor.
     As described in the paper
     `DropBlock: A regularization method for convolutional networks`_ ,
     dropping whole blocks of feature map allows to remove semantic
@@ -33,18 +33,20 @@ class DropBlock2D(nn.Module):
     def forward(self, x):
         # shape: (bsize, channels, height, width)
 
-        assert x.dim() == 4, \
-            "Expected input with 4 dimensions (bsize, channels, height, width)"
+        assert (
+            x.dim() == 4
+        ), "Expected input with 4 dimensions (bsize, channels, height, width)"
 
-        if not self.training or self.drop_prob == 0.:
+        if not self.training or self.drop_prob == 0.0:
             return x
         else:
             # get gamma value
             gamma = self._compute_gamma(x)
 
             # sample mask
-            mask = (torch.cuda.FloatTensor(x.shape[0], *x.shape[
-                                                        2:]).uniform_() < gamma).float()  # (torch.rand(x.shape[0], *x.shape[2:]) < gamma).float()
+            mask = (
+                torch.cuda.FloatTensor(x.shape[0], *x.shape[2:]).uniform_() < gamma
+            ).float()  # (torch.rand(x.shape[0], *x.shape[2:]) < gamma).float()
 
             # place mask on input device
             # mask = mask.to(x.device)
@@ -61,10 +63,12 @@ class DropBlock2D(nn.Module):
             return out
 
     def _compute_block_mask(self, mask):
-        block_mask = F.max_pool2d(input=mask[:, None, :, :],
-                                  kernel_size=(self.block_size, self.block_size),
-                                  stride=(1, 1),
-                                  padding=self.block_size // 2)
+        block_mask = F.max_pool2d(
+            input=mask[:, None, :, :],
+            kernel_size=(self.block_size, self.block_size),
+            stride=(1, 1),
+            padding=self.block_size // 2,
+        )
 
         if self.block_size % 2 == 0:
             block_mask = block_mask[:, :, :-1, :-1]

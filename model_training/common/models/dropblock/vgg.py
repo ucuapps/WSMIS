@@ -16,13 +16,12 @@ import math
 import copy
 
 model_urls = {
-    'vgg16': 'https://download.pytorch.org/models/vgg16-397923af.pth',
-    'vgg16_bn': 'https://download.pytorch.org/models/vgg16_bn-6c64b313.pth'
+    "vgg16": "https://download.pytorch.org/models/vgg16-397923af.pth",
+    "vgg16_bn": "https://download.pytorch.org/models/vgg16_bn-6c64b313.pth",
 }
 
 
 class VGG(nn.Module):
-
     def __init__(self, features, num_classes=2):
         super(VGG, self).__init__()
         self.num_classes = num_classes
@@ -49,7 +48,7 @@ class VGG(nn.Module):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-                m.weight.data.normal_(0, math.sqrt(2. / n))
+                m.weight.data.normal_(0, math.sqrt(2.0 / n))
                 if m.bias is not None:
                     m.bias.data.zero_()
             elif isinstance(m, nn.BatchNorm2d):
@@ -64,13 +63,13 @@ class VGG(nn.Module):
 
         for name, value in self.named_parameters():
 
-            if 'extra' in name:
-                if 'weight' in name:
+            if "extra" in name:
+                if "weight" in name:
                     groups[2].append(value)
                 else:
                     groups[3].append(value)
             else:
-                if 'weight' in name:
+                if "weight" in name:
                     groups[0].append(value)
                 else:
                     groups[1].append(value)
@@ -80,7 +79,7 @@ class VGG(nn.Module):
 class VGG_dropblock(nn.Module):
     def __init__(self, model, drop_prob, block_size):
         super(VGG_dropblock, self).__init__()
-        model.load_state_dict(model_zoo.load_url(model_urls['vgg16_bn']), strict=False)
+        model.load_state_dict(model_zoo.load_url(model_urls["vgg16_bn"]), strict=False)
 
         self.dropblock = DropBlock2D(drop_prob=drop_prob, block_size=block_size)
 
@@ -111,13 +110,13 @@ class VGG_dropblock(nn.Module):
 
         for name, value in self.named_parameters():
 
-            if 'extra' in name:
-                if 'weight' in name:
+            if "extra" in name:
+                if "weight" in name:
                     groups[2].append(value)
                 else:
                     groups[3].append(value)
             else:
-                if 'weight' in name:
+                if "weight" in name:
                     groups[0].append(value)
                 else:
                     groups[1].append(value)
@@ -127,13 +126,13 @@ class VGG_dropblock(nn.Module):
 class VGG_dropblock_Scheduler(nn.Module):
     def __init__(self, model, drop_prob, block_size):
         super(VGG_dropblock_Scheduler, self).__init__()
-        model.load_state_dict(model_zoo.load_url(model_urls['vgg16_bn']), strict=False)
+        model.load_state_dict(model_zoo.load_url(model_urls["vgg16_bn"]), strict=False)
 
         self.dropblock_scheduler = LinearScheduler(
             DropBlock2D(drop_prob=drop_prob, block_size=block_size),
-            start_value=0.,
+            start_value=0.0,
             stop_value=drop_prob,
-            nr_steps=10
+            nr_steps=10,
         )
         new_features = nn.Sequential()
         l = 0
@@ -164,13 +163,13 @@ class VGG_dropblock_Scheduler(nn.Module):
 
         for name, value in self.named_parameters():
 
-            if 'extra' in name:
-                if 'weight' in name:
+            if "extra" in name:
+                if "weight" in name:
                     groups[2].append(value)
                 else:
                     groups[3].append(value)
             else:
-                if 'weight' in name:
+                if "weight" in name:
                     groups[0].append(value)
                 else:
                     groups[1].append(value)
@@ -181,9 +180,9 @@ def make_layers(cfg, batch_norm=False):
     layers = []
     in_channels = 3
     for i, v in enumerate(cfg):
-        if v == 'M':
+        if v == "M":
             layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
-        elif v == 'N':
+        elif v == "N":
             layers += [nn.MaxPool2d(kernel_size=3, stride=1, padding=1)]
         else:
             if i > 13:
@@ -199,21 +198,80 @@ def make_layers(cfg, batch_norm=False):
 
 
 cfg = {
-    'A': [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
-    'B': [64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
-    'D': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M'],
-    'D1': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'N', 512, 512, 512],
-    'E': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'M'],
+    "A": [64, "M", 128, "M", 256, 256, "M", 512, 512, "M", 512, 512, "M"],
+    "B": [64, 64, "M", 128, 128, "M", 256, 256, "M", 512, 512, "M", 512, 512, "M"],
+    "D": [
+        64,
+        64,
+        "M",
+        128,
+        128,
+        "M",
+        256,
+        256,
+        256,
+        "M",
+        512,
+        512,
+        512,
+        "M",
+        512,
+        512,
+        512,
+        "M",
+    ],
+    "D1": [
+        64,
+        64,
+        "M",
+        128,
+        128,
+        "M",
+        256,
+        256,
+        256,
+        "M",
+        512,
+        512,
+        512,
+        "N",
+        512,
+        512,
+        512,
+    ],
+    "E": [
+        64,
+        64,
+        "M",
+        128,
+        128,
+        "M",
+        256,
+        256,
+        256,
+        256,
+        "M",
+        512,
+        512,
+        512,
+        512,
+        "M",
+        512,
+        512,
+        512,
+        512,
+        "M",
+    ],
 }
 
 
 def vgg16_dropblock(pretrained=True, drop_prob=0.5, block_size=5, **kwargs):
-    model_vgg_gap = VGG(make_layers(cfg['D1'], batch_norm=True), **kwargs)
+    model_vgg_gap = VGG(make_layers(cfg["D1"], batch_norm=True), **kwargs)
     model = VGG_dropblock(model_vgg_gap, drop_prob, block_size)
     return model
 
 
 def vgg16_dropblock_scheduler(pretrained=True, drop_prob=0.5, block_size=5, **kwargs):
-    model_vgg_gap = VGG(make_layers(cfg['D1'], batch_norm=True), **kwargs)
+    model_vgg_gap = VGG(make_layers(cfg["D1"], batch_norm=True), **kwargs)
     model = VGG_dropblock_Scheduler(model_vgg_gap, drop_prob, block_size)
     return model

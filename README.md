@@ -107,10 +107,6 @@ Our config is organized as follows:
     * `min_lr`: the minimum value of learning rate, values: `[1.0e-6]`
     * `power`: values: `[0.9]`
 
-## TO DO
-* Add training code for ...
-* Code refactoring
-
 ## Citation
 
 ## References

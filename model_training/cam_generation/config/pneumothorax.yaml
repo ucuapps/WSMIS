@@ -1,7 +1,7 @@
 ---
 project: lid_segmentation
 task: pneumothorax_classification
-log_path: /home/dobko/logs
+log_path: /home/logs
 
 devices:
   - 'cuda:1'
@@ -27,7 +27,7 @@ val:
 
 
 model:
-  arch: resnet50_full  #resnet50_dropblock
+  arch: resnet50_full
   pretrained: True
   classes: 1
   loss:

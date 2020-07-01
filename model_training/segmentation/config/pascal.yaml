@@ -1,7 +1,7 @@
 ---
 project: lid_segmentation
 task: segmentation
-log_path: /home/ostap/logs
+log_path: /home/logs
 
 devices:
   - 'cuda:1'

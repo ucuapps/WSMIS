@@ -7,16 +7,17 @@ from model_training.common.models import get_network
 
 
 class CamGrad:
-
     def __init__(self, config, device, return_one_always=True):
-        self.model = get_network(config['model'])
-        self.model.load_state_dict(torch.load(config['model']['weights_path'], map_location=device)['model'])
+        self.model = get_network(config["model"])
+        self.model.load_state_dict(
+            torch.load(config["model"]["weights_path"], map_location=device)["model"]
+        )
         self.config = config
         self.device = device
         self.model.to(self.device)
         self.model.eval()
-        self.prediction_threshold = config.get('prediction_threshold', None)
-        self.set_target_layer_hook(config['model']['target_layer'])
+        self.prediction_threshold = config.get("prediction_threshold", None)
+        self.set_target_layer_hook(config["model"]["target_layer"])
         self.return_one_always = return_one_always
 
         self.activation_maps = None
@@ -25,7 +26,7 @@ class CamGrad:
         self.func_on_target = lambda x: x
 
     def set_target_layer_hook(self, target_layer):
-        modules_path = target_layer.split('.')
+        modules_path = target_layer.split(".")
         module = self.model
         for subpath in modules_path:
             for name, current_module in module.named_children():
@@ -33,7 +34,9 @@ class CamGrad:
                     module = current_module
                     break
             else:
-                raise ValueError(f"Module path {target_layer} is not valid for current module.")
+                raise ValueError(
+                    f"Module path {target_layer} is not valid for current module."
+                )
 
         module.register_forward_hook(self.save_output)
         module.register_backward_hook(self.save_grad)
@@ -72,7 +75,9 @@ class CamGrad:
 
             weights = self.get_maps_weights()  # [K, ]
 
-            class_map = torch.tensordot(weights, self.activation_maps, dims=((0,), (0,)))
+            class_map = torch.tensordot(
+                weights, self.activation_maps, dims=((0,), (0,))
+            )
             # class_map = F.interpolate(class_map[None, None], x.shape[2:], mode='nearest').squeeze()
             class_maps.append(class_map.detach())
 
@@ -94,42 +99,39 @@ class CamGradPlusPlus(CamGrad):
         cubed_grad = squared_grad * self.grad
 
         alpha = squared_grad / (
-                2 * squared_grad + torch.sum(cubed_grad * self.activation_maps, dim=(1, 2), keepdim=True) + gamma)
+            2 * squared_grad
+            + torch.sum(cubed_grad * self.activation_maps, dim=(1, 2), keepdim=True)
+            + gamma
+        )
         return torch.sum(alpha * torch.relu(self.grad), dim=(1, 2))
 
 
 def get_cam_grad_extractor(config, device):
-    name = config['extraction_method']
-    if name == 'grad-cam':
+    name = config["extraction_method"]
+    if name == "grad-cam":
         return CamGrad(config, device)
-    elif name == 'grad-cam++':
+    elif name == "grad-cam++":
         return CamGradPlusPlus(config, device)
     else:
-        raise ValueError(f'Unrecognized mask generation method {name}.')
+        raise ValueError(f"Unrecognized mask generation method {name}.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     model_config = {
-        'arch': 'resnet50',
-        'pretrained': False,
-        'classes': 201,
+        "arch": "resnet50",
+        "pretrained": False,
+        "classes": 201,
     }
     config = {
-        'model': model_config,
-        'target_layer': 'layer4.1.conv3',
-        'prediction_threshold': 0.5
+        "model": model_config,
+        "target_layer": "layer4.1.conv3",
+        "prediction_threshold": 0.5,
     }
 
     model = get_network(model_config).cuda()
     for name, module in model.named_children():
         print("Direct child name: ", name)
         for n, m in module.named_children():
-            print('\t', n)
+            print("\t", n)
     print(list(model.named_modules()))
-    # g = CamGrad(config, 'cuda:0')
-    # X = torch.randn(1, 3, 352, 352)
-    # y = torch.tensor([[10, 20, 30, 40]], dtype=torch.int64)
-    # X, y = X.to('cuda:0'), y.to('cuda:0')
-    # class_maps, y_pred = g.forward(X, y=None)
-    # print(len(class_maps))
-    # print(y_pred)
+
