@@ -54,7 +54,7 @@ All the experiments were performed on four Nvidia Tesla K80 GPUs.
 python train.py
 ```
 
-###Configurations
+### Configurations
 The description of possible configurations for training is provided in `model_training/CONFIGURATIONS.md`
 
 ### Testing
