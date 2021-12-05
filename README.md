@@ -1,6 +1,6 @@
 # Weakly Supervised Medical Images Segmentation
 
-This is an implementation of the [Weakly-Supervised Segmentation for DiseaseLocalization in Chest X-Ray Images](https://github.com/ucuapps/WSMIS) by Ostap Viniavskiy, Maria Dobko, and Oles Dobosevych.
+This is an implementation of the [Weakly-Supervised Segmentation for DiseaseLocalization in Chest X-Ray Images](https://link.springer.com/chapter/10.1007/978-3-030-59137-3_23) by Ostap Viniavskiy, Maria Dobko, and Oles Dobosevych.
 
 
 ## Overview
@@ -61,6 +61,18 @@ The description of possible configurations for training is provided in `model_tr
 Will be added soon
 
 ## Citation
+```
+@incollection{Viniavskyi2020,
+  doi = {10.1007/978-3-030-59137-3_23},
+  url = {https://doi.org/10.1007/978-3-030-59137-3_23},
+  year = {2020},
+  publisher = {Springer International Publishing},
+  pages = {249--259},
+  author = {Ostap Viniavskyi and Mariia Dobko and Oles Dobosevych},
+  title = {Weakly-Supervised Segmentation for Disease Localization in Chest X-Ray Images},
+  booktitle = {Artificial Intelligence in Medicine}
+}
+```
 
 ## References
 * Learning Deep Features for Discriminative Localization: [paper](http://cnnlocalization.csail.mit.edu/Zhou_Learning_Deep_Features_CVPR_2016_paper.pdf)
